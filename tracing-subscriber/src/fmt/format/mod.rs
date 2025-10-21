@@ -1278,6 +1278,14 @@ impl field::Visit for DefaultVisitor<'_> {
             return;
         }
 
+        let name = field.name();
+        // Skip fields that are actually log metadata that have already been handled
+        #[cfg(feature = "tracing-log")]
+        if name.starts_with("log.") {
+            debug_assert_eq!(self.result, Ok(())); // no need to update self.result
+            return;
+        }
+
         self.maybe_pad();
 
         self.result = match name {
